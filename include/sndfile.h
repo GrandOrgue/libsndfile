@@ -472,6 +472,7 @@ enum
 typedef struct
 {	int gain ;
 	char basenote, detune ;
+	uint32_t dwMIDIPitchFraction ;
 	char velocity_lo, velocity_hi ;
 	char key_lo, key_hi ;
 	int loop_count ;

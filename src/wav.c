@@ -1221,14 +1221,15 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 
 	if (psf->instrument != NULL)
 	{	int		tmp ;
-		double	dtune = (double) (0x40000000) / 25.0 ;
+		/* double	dtune = (double) (0x40000000) / 25.0 ; */
 
 		psf_binheader_writef (psf, "m4", BHWm (smpl_MARKER), BHW4 (9 * 4 + psf->instrument->loop_count * 6 * 4)) ;
 		psf_binheader_writef (psf, "44", BHW4 (0), BHW4 (0)) ; /* Manufacturer zero is everyone */
 		tmp = (int) (1.0e9 / psf->sf.samplerate) ; /* Sample period in nano seconds */
 		psf_binheader_writef (psf, "44", BHW4 (tmp), BHW4 (psf->instrument->basenote)) ;
-		tmp = (uint32_t) (psf->instrument->detune * dtune + 0.5) ;
-		psf_binheader_writef (psf, "4", BHW4 (tmp)) ;
+		/* tmp = (uint32_t) (psf->instrument->detune * dtune + 0.5) ;
+		psf_binheader_writef (psf, "4", BHW4 (tmp)) ; */
+		psf_binheader_writef (psf, "4", psf->instrument->dwMIDIPitchFraction) ; /* Lars Palo */
 		psf_binheader_writef (psf, "44", BHW4 (0), BHW4 (0)) ; /* SMTPE format */
 		psf_binheader_writef (psf, "44", BHW4 (psf->instrument->loop_count), BHW4 (0)) ;
 
@@ -1517,6 +1518,7 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, uint32_t chunklen)
 		} ;
 
 	psf->instrument->basenote = note ;
+	psf->instrument->dwMIDIPitchFraction = pitch ; /* Lars Palo */
 	psf->instrument->detune = (int8_t) (pitch / (0x40000000 / 25.0) + 0.5) ;
 	psf->instrument->gain = 1 ;
 	psf->instrument->velocity_lo = psf->instrument->key_lo = 0 ;
